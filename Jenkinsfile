@@ -31,7 +31,7 @@ pipeline {
         stage("Sonar Scan") {
             steps {
                 withSonarQubeEnv(installationName: "SonarQube-Server") {
-                    sh "mvn sonar:sonar -Dsonar.projectName=kwa-${MICROSERVICE}"
+                    sh "mvn verify sonar:sonar -Dsonar.projectName=kwa-${MICROSERVICE}"
                 }
             }
         }
@@ -53,11 +53,7 @@ pipeline {
         stage("Building Image") {
             steps {
                 sh "docker build -t kwa-${MICROSERVICE} ."
-            }
-        }
 
-        stage("Deploying") {
-            steps {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'aws-key', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY']]) {
     
                     sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_USER_ID}.dkr.ecr.${REGION}.amazonaws.com"
@@ -65,6 +61,13 @@ pipeline {
                     sh "docker push ${AWS_USER_ID}.dkr.ecr.${REGION}.amazonaws.com/kwa-${MICROSERVICE}:${COMMIT_HASH}"
                 
                 }
+            }
+        }
+
+        stage("Deploying") {
+            steps {
+                echo "Deploying ${MICROSERVICE}-kwa"
+                sh "aws cloudformation create-stack --stack-name ${MICROSERVICE}-kwa-stack --template-body file://ecs.yml"
             }
         }
     }
