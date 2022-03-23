@@ -67,7 +67,7 @@ pipeline {
         stage("Deploying") {
             steps {
                 echo "Deploying ${MICROSERVICE}-kwa"
-                sh "aws cloudformation create-stack --stack-name ${MICROSERVICE}-kwa-stack --template-body file://ecs.yml"
+                sh "aws cloudformation create-stack --stack-name bank-kwa-stack --profile kevin --template-body file://ecs.yml"
             }
         }
     }

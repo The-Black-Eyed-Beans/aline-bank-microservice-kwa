@@ -11,8 +11,8 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      ExecutionRoleArn: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resources:SecretString:ExecutionRole}}'
-      TaskRoleArn: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resources:SecretString:TaskRole}}'
+      ExecutionRoleArn: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resource:SecretString:ExecutionRole}}'
+      TaskRoleArn: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resource:SecretString:TaskRole}}'
       ContainerDefinitions:
         - Name: bank
           Image: 086620157175.dkr.ecr.us-east-1.amazonaws.com/kwa-bank_microservice
@@ -49,10 +49,10 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           Subnets:
-            - '{{resolve:secretsmanager:aline-kwa/dev/secrets/resources:SecretString:Public1}}'
-            - '{{resolve:secretsmanager:aline-kwa/dev/secrets/resources:SecretString:Public2}}'
+            - '{{resolve:secretsmanager:aline-kwa/dev/secrets/resource:SecretString:Public1}}'
+            - '{{resolve:secretsmanager:aline-kwa/dev/secrets/resource:SecretString:Public2}}'
           SecurityGroups:
-            - '{{resolve:secretsmanager:aline-kwa/dev/secrets/resources:SecretString:ServiceSG}}'
+            - '{{resolve:secretsmanager:aline-kwa/dev/secrets/resource:SecretString:Sghttp}}'
       LoadBalancers:
         - ContainerName: bank
           ContainerPort: 8083
@@ -61,7 +61,7 @@ Resources:
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      VpcId: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resources:SecretString:VpcId}}'
+      VpcId: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resource:SecretString:VpcId}}'
       Port: 8083
       TargetType: ip
       Protocol: HTTP
@@ -76,6 +76,6 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
-      LoadBalancerArn: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resources:SecretString:LoadBalancerArn}}'
+      LoadBalancerArn: '{{resolve:secretsmanager:aline-kwa/dev/secrets/resource:SecretString:LoadBalancerArn}}'
       Port: 8083
       Protocol: HTTP
